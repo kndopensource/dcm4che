@@ -151,12 +151,12 @@ class AuditUtils {
         activeParticipants[0] = new ActiveParticipantBuilder.Builder(
                 userName,
                 info.getField(AuthInfo.IP_ADDR))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.PersonID)
+//                .userIDTypeCode(AuditMessages.UserIDTypeCode.PersonID)
                 .isRequester().build();
         activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                 auditLogger.getDevice().getDeviceName(),
                 auditLogger.getConnections().get(0).getHostname())
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+  //              .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                 .altUserID(AuditLogger.processID()).build();
         return activeParticipants;
     }
