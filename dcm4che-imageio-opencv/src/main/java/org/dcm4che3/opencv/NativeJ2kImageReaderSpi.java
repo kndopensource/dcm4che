@@ -77,10 +77,13 @@ public class NativeJ2kImageReaderSpi extends ImageReaderSpi {
 
     @Override
     public boolean canDecodeInput(Object source) throws IOException {
-        if (!(source instanceof ImageInputStream)) {
+        // NativeImageReader.read() eventually instantiates a StreamSegment,
+        // which does not support all ImageInputStreams
+        if (!StreamSegment.supportsInputStream(source)) {
             return false;
         }
         ImageInputStream iis = (ImageInputStream) source;
+
         iis.mark();
         try {
             int marker = (iis.read() << 8) | iis.read();

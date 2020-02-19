@@ -17,7 +17,7 @@
  *
  * The Initial Developer of the Original Code is
  * J4Care.
- * Portions created by the Initial Developer are Copyright (C) 2015-2018
+ * Portions created by the Initial Developer are Copyright (C) 2015-2019
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -39,60 +39,49 @@
  *
  */
 
-package org.dcm4che3.opencv;
-
-import java.util.Locale;
-
-import javax.imageio.ImageWriteParam;
+package org.dcm4che3.data;
 
 /**
- * @author Nicolas Roduit
- * @since Aug 2018
+ * @author Gunter Zeilinger (gunterze@protonmail.com)
+ * @since Feb 2020
  */
-public class J2kImageWriteParam extends ImageWriteParam {
+public enum HL7Separator {
+    FIELD("|", "\\F\\"),
+    COMPONENT("^", "\\S\\"),
+    SUBCOMPONENT("&", "\\T\\"),
+    REPETITION("~", "\\R\\"),
+    ESCAPE("\\", "\\E\\");
 
-    private static final String[] COMPRESSION_TYPES = { "LOSSY", "LOSSLESS" };
+    public final String separator;
+    public final String escapeSequence;
 
-    private int compressionRatiofactor;
-
-    public J2kImageWriteParam(Locale locale) {
-        super(locale);
-        super.canWriteCompressed = true;
-        super.compressionMode = MODE_EXPLICIT;
-        super.compressionType = "LOSSY";
-        super.compressionTypes = COMPRESSION_TYPES;
-        this.compressionRatiofactor = 10; // 10:1 is considered as visually lossless
-    }
-    
-    @Override
-    public void setCompressionType(String compressionType) {
-        super.setCompressionType(compressionType);
-        if(isCompressionLossless()) {
-            this.compressionRatiofactor = 0;   
-        }
+    HL7Separator(String separator, String escapeSequence) {
+        this.separator = separator;
+        this.escapeSequence = escapeSequence;
     }
 
-    @Override
-    public boolean isCompressionLossless() {
-        return compressionType.equals("LOSSLESS");
+    public String escape(String s) {
+        return s.replace(separator, escapeSequence);
     }
 
-    public int getCompressionRatiofactor() {
-        return compressionRatiofactor;
+    public String unescape(String s) {
+        return s.replace(escapeSequence, separator);
     }
 
-    /**
-     * Set the lossy compression factor
-     * 
-     * Near-lossless compression ratios of 5:1 to 20:1 (e.g. compressionRatiofactor = 10)
-     * 
-     * Lossy compression with acceptable degradation can have ratios of 30:1 to 100:1 (e.g. compressionRatiofactor = 50)
-     * 
-     * @param compressionRatiofactor
-     *            the compression ratio
-     */
-    public void setCompressionRatiofactor(int compressionRatiofactor) {
-        this.compressionRatiofactor = compressionRatiofactor;
+    public static String escapeAll(String s) {
+        return FIELD.escape(
+                COMPONENT.escape(
+                        SUBCOMPONENT.escape(
+                                REPETITION.escape(
+                                        ESCAPE.escape(s)))));
+    }
+
+    public static String unescapeAll(String s) {
+        return ESCAPE.unescape(
+                REPETITION.unescape(
+                        SUBCOMPONENT.unescape(
+                                COMPONENT.unescape(
+                                        FIELD.unescape(s)))));
     }
 
 }

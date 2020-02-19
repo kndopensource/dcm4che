@@ -17,7 +17,7 @@
  *
  * The Initial Developer of the Original Code is
  * J4Care.
- * Portions created by the Initial Developer are Copyright (C) 2015-2018
+ * Portions created by the Initial Developer are Copyright (C) 2015-2019
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -39,60 +39,25 @@
  *
  */
 
-package org.dcm4che3.opencv;
+package org.dcm4che3.data;
 
-import java.util.Locale;
+import org.junit.Test;
 
-import javax.imageio.ImageWriteParam;
+import static org.junit.Assert.*;
 
 /**
- * @author Nicolas Roduit
- * @since Aug 2018
+ * @author Gunter Zeilinger (gunterze@protonmail.com)
+ * @since Feb 2020
  */
-public class J2kImageWriteParam extends ImageWriteParam {
+public class HL7SeparatorTest {
 
-    private static final String[] COMPRESSION_TYPES = { "LOSSY", "LOSSLESS" };
-
-    private int compressionRatiofactor;
-
-    public J2kImageWriteParam(Locale locale) {
-        super(locale);
-        super.canWriteCompressed = true;
-        super.compressionMode = MODE_EXPLICIT;
-        super.compressionType = "LOSSY";
-        super.compressionTypes = COMPRESSION_TYPES;
-        this.compressionRatiofactor = 10; // 10:1 is considered as visually lossless
-    }
-    
-    @Override
-    public void setCompressionType(String compressionType) {
-        super.setCompressionType(compressionType);
-        if(isCompressionLossless()) {
-            this.compressionRatiofactor = 0;   
-        }
+    @Test
+    public void escapeAll() {
+        assertEquals("\\F\\\\S\\\\R\\\\E\\\\T\\", HL7Separator.escapeAll("|^~\\&"));
     }
 
-    @Override
-    public boolean isCompressionLossless() {
-        return compressionType.equals("LOSSLESS");
+    @Test
+    public void unescapeAll() {
+        assertEquals("|^~\\&", HL7Separator.unescapeAll("\\F\\\\S\\\\R\\\\E\\\\T\\"));
     }
-
-    public int getCompressionRatiofactor() {
-        return compressionRatiofactor;
-    }
-
-    /**
-     * Set the lossy compression factor
-     * 
-     * Near-lossless compression ratios of 5:1 to 20:1 (e.g. compressionRatiofactor = 10)
-     * 
-     * Lossy compression with acceptable degradation can have ratios of 30:1 to 100:1 (e.g. compressionRatiofactor = 50)
-     * 
-     * @param compressionRatiofactor
-     *            the compression ratio
-     */
-    public void setCompressionRatiofactor(int compressionRatiofactor) {
-        this.compressionRatiofactor = compressionRatiofactor;
-    }
-
 }
