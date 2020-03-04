@@ -56,6 +56,7 @@ public class DicomImageReadParam extends ImageReadParam {
     private int voiLUTIndex;
     private int overlayActivationMask = 0xf;
     private int overlayGrayscaleValue = 0xffff;
+    private int overlayRGBValue = 0xffffff;
     private Attributes presentationState;
 
     public float getWindowCenter() {
@@ -130,4 +131,19 @@ public class DicomImageReadParam extends ImageReadParam {
         this.overlayGrayscaleValue = overlayGrayscaleValue;
     }
 
+    public int getOverlayRGBValue() {
+        return overlayRGBValue;
+    }
+
+    public void setOverlayRGBValue(int overlayRGBValue) {
+        this.overlayRGBValue = overlayRGBValue;
+    }
+
+    public int[] getOverlayCIELabValue() {
+        int[] ints = {(overlayRGBValue >> 16) & 0xff, (overlayRGBValue >> 8) & 0xff, overlayRGBValue & 0xff};
+        ints[0] |= ints[0] << 8;
+        ints[1] |= ints[1] << 8;
+        ints[2] |= ints[2] << 8;
+        return ints;
+    }
 }
